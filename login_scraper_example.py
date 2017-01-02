@@ -5,8 +5,8 @@ from lxml import html
 USERNAME = "<USERNAME>"
 PASSWORD = "<PASSWORD>"
 
-LOGIN_URL = "https://bitbucket.org/account/signin/?next=/"
-URL = "https://bitbucket.org/dashboard/overview"
+LOGIN_URL = "http://www.marianos.com/signin?fromUrl=%2Fmypantry"
+URL = "http://www.marianos.com/mypantry"
 
 def main():
     session_requests = requests.session()
@@ -14,13 +14,11 @@ def main():
     # Get login csrf token
     result = session_requests.get(LOGIN_URL)
     tree = html.fromstring(result.text)
-    authenticity_token = list(set(tree.xpath("//input[@name='csrfmiddlewaretoken']/@value")))[0]
 
     # Create payload
     payload = {
-        "username": USERNAME, 
-        "password": PASSWORD, 
-        "csrfmiddlewaretoken": authenticity_token
+        "usernameField": USERNAME, 
+        "passwordField": PASSWORD, 
     }
 
     # Perform login
@@ -29,7 +27,7 @@ def main():
     # Scrape url
     result = session_requests.get(URL, headers = dict(referer = URL))
     tree = html.fromstring(result.content)
-    bucket_names = tree.xpath("//div[@class='repo-list--repo']/a/text()")
+    bucket_names = tree.xpath("//div[@class='row ng-scope']/a/text()")
 
     print(bucket_names)
 
